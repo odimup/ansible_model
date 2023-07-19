@@ -1,0 +1,13 @@
+---
+
+- hosts: localhost
+  gather_facts: true
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python3.8
+  roles:
+    - role: remove_os_containers_em_execucao
+    - role: remove_imagens
+    - role: remove_volumes
+    - role: remove_diretorios_dos_volumes
+    - role: clone_do_projeto
+    - role: start_containers
