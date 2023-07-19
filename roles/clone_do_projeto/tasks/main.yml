@@ -9,7 +9,7 @@
 
 - name: Fazendo o git checkout para a branch {{ BRANCH }}
   git:
-    repo: climatos_integration@bitbucket.org:simepar/climatos-integration.git
+    repo: <user>@bitbucket.org:<repo>/<project>.git
     dest: /tmp/{{ CLIENT }}_{{ DEPLOY }}
     version: "{{ BRANCH }}"
     key_file: ~/.ssh/bitbucket_key
