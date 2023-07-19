@@ -1,0 +1,21 @@
+- name: Verificando status dos containers
+  docker_container_info:
+    name: "{{ item }}"
+  register: container_info
+  with_items:
+    - climatos-integration-nginx-{{ CLIENT }}-{{ DEPLOY }}
+    - climatos-integration-web-{{ CLIENT }}-{{ DEPLOY }}
+    - climatos-integration-run-change-historical-watershed-stretch-{{ CLIENT }}-{{ DEPLOY }}
+    - climatos-integration-send-reservoir-file-to-bucket-{{ CLIENT }}-{{ DEPLOY }}
+    - climatos-integration-send-station-file-to-bucket-{{ CLIENT }}-{{ DEPLOY }}
+    - climatos-integration-run-change-historical-station-{{ CLIENT }}-{{ DEPLOY }}
+    - climatos-postgres-integration-{{ CLIENT }}-{{ DEPLOY }}
+  ignore_errors: true
+
+- name: removendo containers
+  docker_container:
+    name: "{{ item.item }}"
+    state: absent
+  #loop: "{{ container_info.results | json_query('[].{name: item.item, exists: exists}') }}"
+  loop: "{{ container_info.results }}"
+  when: item.exists | default(false)

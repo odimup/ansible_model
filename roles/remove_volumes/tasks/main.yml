@@ -1,0 +1,17 @@
+- name: Verificando status dos volumes
+  docker_volume_info:
+    name: "{{ item }}"
+  register: volume_info
+  with_items:
+    - "{{ CLIENT }}_{{ DEPLOY }}_climatos_integration"
+    - "{{ CLIENT }}_{{ DEPLOY }}_climatos_integration_run"
+    - "{{ CLIENT }}_{{ DEPLOY }}_db_integration"
+    - "{{ CLIENT }}_{{ DEPLOY }}_integration"
+  ignore_errors: true
+
+- name: Removendo volumes
+  docker_volume:
+    name: "{{ item.item }}"
+    state: absent
+  loop: "{{ volume_info.results }}"
+  when: item.exists | default(false)

@@ -1,0 +1,24 @@
+- name: Criando os containers
+  shell: docker-compose -f /tmp/{{ CLIENT }}_{{ DEPLOY }}/docker-compose.yml up --build --force-recreate -d
+  register: script
+
+- name: Validando migração de dados
+  shell: docker exec -i climatos-integration-web-{{ CLIENT }}-{{ DEPLOY }} python manage.py migrate --settings=integration.settings.docker
+  register: validacao_de_migracao
+
+- name: Parar o container
+  docker_container:
+    name: climatos-integration-web-{{ CLIENT }}-{{ DEPLOY }}
+    state: stopped
+
+- name: Iniciar o container
+  docker_container:
+    name: climatos-integration-web-{{ CLIENT }}-{{ DEPLOY }}
+    state: started
+
+- name: Removendo a pasta /tmp/{{ CLIENT }}_{{ DEPLOY }}/ após o deploy realizado.
+  file:
+    path: /tmp/{{ CLIENT }}_{{ DEPLOY }}/
+    state: absent
+  become_user: climatos
+  become: true

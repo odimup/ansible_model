@@ -1,0 +1,12 @@
+- name: Removendo diretórios dos volumes
+  file:
+    path: "/opt/docker/data/volumes/{{ item }}"
+    state: absent
+  register: dir_info
+  become_user: climatos
+  become: true
+  with_items:
+    - "{{ CLIENT }}_{{ DEPLOY }}_climatos_integration"
+    - "{{ CLIENT }}_{{ DEPLOY }}_climatos_integration_run"
+    - "{{ CLIENT }}_{{ DEPLOY }}_db_integration"
+    - "{{ CLIENT }}_{{ DEPLOY }}_integration"

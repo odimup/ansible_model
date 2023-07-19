@@ -1,0 +1,49 @@
+- name: Criando a pasta /tmp/{{ CLIENT }}_{{ DEPLOY }}/
+  file:
+    path: /tmp/{{ CLIENT }}_{{ DEPLOY }}/
+    state: directory
+    owner: climatos
+    group: climatos
+  become_user: climatos
+  become: true
+
+- name: Fazendo o git checkout para a branch {{ BRANCH }}
+  git:
+    repo: climatos_integration@bitbucket.org:simepar/climatos-integration.git
+    dest: /tmp/{{ CLIENT }}_{{ DEPLOY }}
+    version: "{{ BRANCH }}"
+    key_file: ~/.ssh/bitbucket_key
+  become: true
+  become_user: climatos
+
+- shell: cd /tmp/{{ CLIENT }}_{{ DEPLOY }} && git branch
+  register: branch_atual
+
+- debug: msg="{{ branch_atual.stdout }}" 
+
+- name: inserindo variáveis no docker-compose principal
+  template:
+    src: /tmp/{{ CLIENT }}_{{ DEPLOY }}/docker-compose.j2
+    dest: /tmp/{{ CLIENT }}_{{ DEPLOY }}/docker-compose.yml
+    owner: climatos
+    group: climatos
+  become_user: climatos
+  become: true
+
+- name: inserindo variáveis no Dockerfile do postgresql
+  template:
+    src: /tmp/{{ CLIENT }}_{{ DEPLOY }}/docker_env/Dockerfile.j2
+    dest: /tmp/{{ CLIENT }}_{{ DEPLOY }}/docker_env/Dockerfile
+    owner: climatos
+    group: climatos
+  become_user: climatos
+  become: true
+
+- name: inserindo variáveis no Dockerfile do nginx
+  template:
+    src: /tmp/{{ CLIENT }}_{{ DEPLOY }}/integration/docker/nginx/Dockerfile.j2
+    dest: /tmp/{{ CLIENT }}_{{ DEPLOY }}/integration/docker/nginx/Dockerfile
+    owner: climatos
+    group: climatos
+  become_user: climatos
+  become: true

@@ -1,0 +1,20 @@
+- name: Verificando status das imagens
+  docker_image_info:
+    name: "{{ item }}"
+  register: image_info
+  with_items:
+    - climatos-postgres-integration-{{ CLIENT }}-{{ DEPLOY }}-img
+    - climatos-integration-nginx-{{ CLIENT }}-{{ DEPLOY }}-img
+    - climatos-integration-web-{{ CLIENT }}-{{ DEPLOY }}-img
+    - climatos-integration-run-change-historical-station-{{ CLIENT }}-{{ DEPLOY }}-img
+    - climatos-integration-run-change-historical-watershed-stretch-{{ CLIENT }}-{{ DEPLOY }}-img
+    - climatos-integration-send-reservoir-file-to-bucket-{{ CLIENT }}-{{ DEPLOY }}-img
+    - climatos-integration-send-station-file-to-bucket-{{ CLIENT }}-{{ DEPLOY }}-img
+  ignore_errors: true
+
+- name: Removendo imagens
+  docker_image:
+    name: "{{ item.item }}"
+    state: absent
+  loop: "{{ image_info.results }}"
+  when: item.exists | default(false)
